@@ -1,35 +1,26 @@
-"""import csv
+import csv
 import os
 from datetime import datetime
+from pathlib import Path
+from Clase_Cliente.cliente import Cliente
+from Clase_Turnos.turnos import Turnos
 
 DATE_FORMAT = "%H:%M %d/%m/%Y"
 
-
-# CLASES
-
-class Cliente:
-    def __init__(self, nombre, telefono, dni, email):
-        self.nombre = nombre
-        self.telefono = telefono
-        self.dni = dni
-        self.email = email
-
-
-class Turnos:
-    def __init__(self, cliente, hora_fecha, servicio, estado="Pendiente"):
-        self.cliente = cliente
-        self.hora_fecha = hora_fecha
-        self.servicio = servicio
-        self.estado = estado
-
-
 class Gestor_de_Turnos:
-    def __init__(self, archivo_csv="turnos.csv"):
-        self.archivo_csv = archivo_csv
+    def __init__(self, archivo_csv=None):
+        # Si no se pasa una ruta, usar `turnos.csv` en la carpeta raíz del paquete `TP_Turnos`
+        if archivo_csv is None:
+            base = Path(__file__).resolve().parent.parent
+            archivo_csv = base / "turnos.csv"
+        else:
+            archivo_csv = Path(archivo_csv)
+
+        # Guardar como string para compatibilidad con funciones actuales
+        self.archivo_csv = str(archivo_csv)
         self.turnos = []
         self.dic_turnos = {}
         self.cargar_turnos_desde_csv()
-
 
 # REGISTRO DE CLIENTES
 
@@ -61,7 +52,6 @@ class Gestor_de_Turnos:
         
         turno = Turnos(cliente, fecha, servicio)
         self.turnos.append(turno)
-        self.actualizar_csv()
         self.guardar_turno_en_csv()
         print("Turno Guardado.")
 
@@ -205,35 +195,3 @@ class Gestor_de_Turnos:
                 turno = Turnos(cliente, hora_fecha, servicio, estado)
                 self.turnos.append(turno)
         self.actualizar_csv()
-
-# MENU
-
-def main():
-    gestor = Gestor_de_Turnos()
-
-    while True:
-        print("\n--- Menú de Peluquería ---")
-        print("1. Solicitar Turno")
-        print("2. Listar Turnos")
-        print("3. Modificar Turno")
-        print("4. Filtrar Turnos por Fecha")
-        print("5. Salir")
-
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == "1":
-            gestor.solicitar_turno()
-        elif opcion == "2":
-            gestor.listar_turnos()
-        elif opcion == "3":
-            gestor.modificar_turno()
-        elif opcion == "4":
-            gestor.filtrar_turnos_por_fecha()
-        elif opcion == "5":
-            print("Saliendo.")
-            break
-        else:
-            print("Opción incorrecta.")
-
-if __name__ == "__main__":
-    main()"""
