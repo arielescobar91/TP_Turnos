@@ -1,3 +1,5 @@
 nombre,telefono,dni,email,hora_fecha,servicio,estado
 prueba,000,0,test@example.com,12:00 01/12/2025,corte,Pendiente
 Ariel,1168666161,36530050,aescobar@teco.com.ar,15:00 01/12/2025,corte,Pendiente
+yisus,00000001,00000001,yisus@dios.com,16:00 01/12/2025,corte,Pendiente
+a,0000,0000,noce@gmail.com,14:00 02/12/2025,corte,Pendiente
