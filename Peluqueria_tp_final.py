@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 
 DATE_FORMAT = "%H:%M %d/%m/%Y"
+
+
 # CLASES
 
 class Cliente:
@@ -43,7 +45,7 @@ class Gestor_de_Turnos:
 
     def solicitar_turno(self):
         cliente = self.registrar_cliente()
-        fecha_str = input("Ingrese Hora/Fecha ({DATE_FORMAT}): ")
+        fecha_str = input(f"Ingrese Hora/Fecha ({DATE_FORMAT}): ")
 
         try:
             fecha = datetime.strptime(fecha_str, DATE_FORMAT)
@@ -96,16 +98,20 @@ class Gestor_de_Turnos:
         for i, t in enumerate(encontrado, 1):
             print(f"{i}. {t.hora_fecha.strftime(DATE_FORMAT)} | {t.servicio} | {t.estado}")
 
-        seleccion = int(input("Turno a modificar: "))
+        seleccion = input("Turno a modificar: ")
         if not seleccion.isdigit() or int(seleccion) not in range(1, len(encontrado) + 1):
             print("Selección incorrecta.")
             return
         
         t = encontrado[int(seleccion) - 1]
-        nuevo_estado = input("Nuevo estado (Pendiente/Confirmado/Cancelado): ")
+        nuevo_estado = input("Nuevo estado (Pendiente/Confirmado/Cancelado): ").capitalize()
+        if nuevo_estado not in ["Pendiente", "Confirmado", "Cancelado"]:
+            print("Estado inválido.")
+            return
+        
         t.estado = nuevo_estado
         self.actualizar_csvdist()
-        self.guardar_turno_en_csvdist()
+        self.sobre_escribir_csvdist()
         print("Turno modificado.")
 
 # FILTRAR LAS FECHAS
@@ -115,7 +121,7 @@ class Gestor_de_Turnos:
         try:
             fecha = datetime.strptime(fecha_str, "%d/%m/%Y").date()
         except ValueError:
-            print("Fecha inesixtente.")
+            print("Fecha inexistente.")
             return
         
         turnos_filtrados = [t for t in self.turnos if t.hora_fecha.date() == fecha]
@@ -145,10 +151,32 @@ class Gestor_de_Turnos:
 # GUARDADO Y CARGA DE CSVDIST
 
     def guardar_turno_en_csvdist(self):
+        archivo_vacio = not os.path.exists(self.archivo_csvdist) or os.path.getsize(self.archivo_csvdist) == 0
+
+        with open(self.archivo_csvdist, "a", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+                
+            if archivo_vacio:
+                writer.writerow(["nombre", "telefono", "dni", "email", "hora_fecha", "servicio", "estado"])
+             
+                ultimo = self.turnos[-1]
+                writer.writerow([
+                    ultimo.cliente.nombre,
+                    ultimo.cliente.telefono,
+                    ultimo.cliente.dni,
+                    ultimo.cliente.email,
+                    ultimo.hora_fecha.strftime(DATE_FORMAT),
+                    ultimo.servicio,
+                    ultimo.estado
+                ])
+    
+
+    def sobre_escribir_csvdist(self):
         with open(self.archivo_csvdist, "w", newline="", encoding="utf-8") as csvfile:
-             writer = csv.writer(csvfile)
-             writer.writerow(["nombre", "telefono", "dni", "email", "hora_fecha", "servicio", "estado"])
-             for t in self.turnos:
+                writer = csv.writer(csvfile)
+                writer.writerow(["nombre", "telefono", "dni", "email", "hora_fecha", "servicio", "estado"])
+
+                for t in self.turnos:
                  writer.writerow([
                      t.cliente.nombre,
                      t.cliente.telefono,
